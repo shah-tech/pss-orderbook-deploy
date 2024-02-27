@@ -1,0 +1,9 @@
+FROM public.ecr.aws/nginx/nginx:stable
+# FROM nginx:stable
+COPY src/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY src/nginx/html /usr/share/nginx/html
+COPY src/nginx/setup.sh /home/setup.sh
+RUN chmod 777 /home/setup.sh
+ENV uri=localhost
+WORKDIR /home
+CMD ["./setup.sh"]

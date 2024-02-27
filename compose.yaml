@@ -1,0 +1,27 @@
+services:
+  db:
+    container_name: orderbookdb
+    build:
+      context: .
+      dockerfile: Dockerfiles/Dockerfile_mysql
+  api:
+    container_name: api
+    tty: true
+    build:
+      context: .
+      dockerfile: Dockerfiles/Dockerfile_fastapi
+    ports:
+      - "8000:8000"
+  redis:
+    image: "redis:6.2.7"
+    container_name: orderbookcache
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfiles/Dockerfile_nginx_compose
+    container_name: nginx
+    environment:
+      - uri=54.193.225.34:8000
+    ports:
+        - "80:80"
+

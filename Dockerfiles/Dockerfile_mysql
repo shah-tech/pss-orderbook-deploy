@@ -1,0 +1,8 @@
+#FROM mysql:8.0.31
+FROM public.ecr.aws/docker/library/mysql:8.0.31
+ENV MYSQL_ROOT_PASSWORD=wiley123
+ENV MYSQL_DATABASE=orderbook
+ENV MYSQL_USER=wiley
+ENV MYSQL_PASSWORD=wiley123
+
+COPY src/mysql/init /docker-entrypoint-initdb.d/ 

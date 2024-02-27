@@ -1,0 +1,55 @@
+pipeline {
+    agent none
+    parameters {
+        string(name: 'TEAM_NUMBER', defaultValue: '01', description: 'Team number (e.g., 01)')
+        string(name: 'COHORT', defaultValue: 'c500', description: 'Cohort (e.g., c500)')
+    }
+    environment {
+        ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
+    }
+    stages {
+        stage("Build Trading Front End ") {
+            agent {
+                node {
+                    label 'kaniko'
+                }
+            }
+            steps {
+                container(name: 'kaniko') {
+                    sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+/kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_nginx -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${COHORT}team${TEAM_NUMBER}fe-dev-${BUILD_NUMBER}"""
+                }
+            }
+        }
+
+        stage("Build and Publish DB ") {
+            agent {
+                node {
+                    label 'kaniko'
+                }
+            }
+            steps {
+                container(name: 'kaniko') {
+                    sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+/kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_mysql -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${COHORT}team${TEAM_NUMBER}db-dev-${BUILD_NUMBER}"""
+                }
+            }
+        }
+
+        stage("Build and Publish API - ") {
+            agent {
+                node {
+                    label 'kaniko'
+                }
+            }
+            steps {
+                container(name: 'kaniko') {
+                    sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+/kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_fastapi -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${COHORT}team${TEAM_NUMBER}api-dev-${BUILD_NUMBER}"""
+                }
+            }
+        }
+
+        // Add more stages by copy-pasting the above blocks and changing the team number.
+    }
+}

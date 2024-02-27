@@ -1,0 +1,20 @@
+FROM public.ecr.aws/docker/library/python:3.10-slim
+# FROM python:3.10.0
+
+# 
+WORKDIR /code
+
+
+COPY src/fastapi /code
+
+# 
+# COPY ./volumes/fastapi-volume/requirements.txt /code/requirements.txt
+
+# 
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+# 
+
+# 
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--workers", "2"]
+

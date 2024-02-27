@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: orderbook
+  name: currencyapi
+  namespace: <COHORT>-<TEAM>-dev
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      name: currencyapi
+  template:
+    metadata:
+      labels:
+        name: currencyapi
+    spec:
+      containers:
+      - name: currencyapi
+        image: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course:<COHORT><TEAM>currency-api-dev-1" # {"$imagepolicy": "flux-system:<COHORT><TEAM>devcurrency"}
+        imagePullPolicy: Always
+        ports:
+        - name: api
+          containerPort: 8000
+        resources:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
+        restartPolicy: Always

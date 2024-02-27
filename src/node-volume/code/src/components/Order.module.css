@@ -1,0 +1,45 @@
+.order {
+  margin: 1rem;
+  padding: 1rem;
+  background-color: #033e0d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+}
+
+.order .buy {
+    color: yellow;
+    margin-right: 10%;
+    text-decoration: none;
+}
+
+.sell {
+    color: yellow;
+    margin-left: 10%;
+    text-decoration: none;
+}
+
+.order h2 {
+  font-size: 2rem;
+  color: #f7e702;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.order h3 {
+  color: #eccf77;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.order h4 {
+  box-sizing: border-box;
+  margin-bottom: .25rem;
+  margin-top: .65rem;
+}
+
+.order a{
+  font-size: small;
+  text-decoration: none;
+}

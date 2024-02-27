@@ -1,0 +1,10 @@
+exchange,exchangeShortName,name,price,symbol,type
+New York Stock Exchange Arca,AMEX,SPDR S&P 500 ETF Trust,364.55,SPY,etf
+NASDAQ Global Select,NASDAQ,Comcast Corporation,30.86,CMCSA,stock
+New York Stock Exchange,NYSE,"Kinder Morgan, Inc.",16.51,KMI,stock
+New York Stock Exchange,NYSE,Morgan Stanley,80.7,MS,stock
+NASDAQ Global Select,NASDAQ,"Tesla, Inc.",0.00,TSLA,stock
+NASDAQ Global Select,NASDAQ,Intel Corporation,26.89,INTC,stock
+New York Stock Exchange Arca,AMEX,VanEck Gold Miners ETF,xx.xx,GDX,et
+New York Stock Exchange,NYSE,General Electric Company,A4.35,GE,stock
+New York Stock Exchange,NYSE,Bank of America Corporation,30.82,BAC,stock

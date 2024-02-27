@@ -1,0 +1,9 @@
+FROM public.ecr.aws/nginx/nginx:stable
+# FROM nginx:stable
+COPY src/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY src/nginx/html /usr/share/nginx/html
+COPY src/nginx/setup-compose.sh /home/setup-compose.sh
+RUN chmod 777 /home/setup-compose.sh
+ENV uri=localhost
+WORKDIR /home
+CMD ["./setup-compose.sh"]

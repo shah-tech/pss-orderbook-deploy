@@ -1,0 +1,13 @@
+fastapi>=0.68.0,<0.69.0
+pydantic>=1.8.0,<2.0.0
+uvicorn>=0.15.0,<0.16.0
+pandas==1.5.3
+SQLAlchemy==2.0.4
+cryptography==39.0.2
+passlib[bcrypt]
+time-it==3
+pymysql==1.0.2
+redis==4.5.1
+requests
+prometheus-fastapi-instrumentator==5.10.0
+python-logging-loki==0.3.1
