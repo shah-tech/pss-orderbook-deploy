@@ -26,7 +26,7 @@ pipeline {
               buildNumber = Jenkins.instance.getItem(projectName).lastSuccessfulBuild.number
             }
             sh '''
-            aws ecr list-images --repository-name production-support-course
+            aws ecr list-images --repository-name production-support-course | grep 'c374team02'
 '''
         }
       }
