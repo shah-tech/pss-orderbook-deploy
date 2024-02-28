@@ -26,7 +26,7 @@ pipeline {
               buildNumber = Jenkins.instance.getItem(projectName).lastSuccessfulBuild.number
             }
             sh '''
-            aws ecr list-images --repository-name production-support-course | dev_tags=$(echo "$image_tags" | grep "c374team02" | grep "dev" | sort) uat_tags=$(echo "$image_tags" | grep "c374team02" | grep "uat" | sort) prod_tags=$(echo "$image_tags" | grep "c374team02" | grep "prod" | sort)
+            aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02" image_tags.txt | grep "dev" | sort) uat_tags=$(grep "c374team02" image_tags.txt | grep "uat" | sort) prod_tags=$(grep "c374team02" image_tags.txt | grep "prod" | sort)
 '''
         }
       }
