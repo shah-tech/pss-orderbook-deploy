@@ -26,9 +26,18 @@ pipeline {
               buildNumber = Jenkins.instance.getItem(projectName).lastSuccessfulBuild.number
             }
             sh '''
-            dev_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02" | grep "dev" | sort | tail -n 1))
-            uat_tags=$(aws ecr list-images --repository-name production-support-course | uat_tags=$(grep "c374team02" | grep "uat" | sort | tail -n 1))
-            prod_tags=$(aws ecr list-images --repository-name production-support-course | prod_tags=$(grep "c374team02" | grep "prod" | sort | tail -n 1))
+            dev_api_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02" | grep "dev" | sort | tail -n 1))
+            dev_currapi_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02currency-api" | grep "dev" | sort | tail -n 1))
+            dev_fe_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02fe" | grep "dev" | sort | tail -n 1))
+            dev_db_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02db" | grep "dev" | sort | tail -n 1))
+            uat_api_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02" | grep "dev" | sort | tail -n 1))
+            uat_currapi_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02currency-api" | grep "dev" | sort | tail -n 1))
+            uat_fe_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02fe" | grep "dev" | sort | tail -n 1))
+            uat_db_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02db" | grep "dev" | sort | tail -n 1))
+            prod_api_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02" | grep "dev" | sort | tail -n 1))
+            prod_currapi_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02currency-api" | grep "dev" | sort | tail -n 1))
+            prod_fe_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02fe" | grep "dev" | sort | tail -n 1))
+            prod_db_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02db" | grep "dev" | sort | tail -n 1))
             echo "$dev_tags"$'\n'"$uat_tags"$'\n'"$prod_tags"
 '''
         }
