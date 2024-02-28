@@ -1,0 +1,47 @@
+pipeline {
+  agent {
+    kubernetes {
+        yaml """\
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        builder: promotion
+    spec:
+      serviceAccountName: jenkins-agent
+      containers:
+      - name: awscli
+        image: amazon/aws-cli
+        command:
+        - cat
+        tty: true
+    """.stripIndent()
+    }
+  }
+  stages {
+    stage('Promote to UAT') {
+      steps {
+          container(name: 'awscli') {
+            script {
+              buildNumber = Jenkins.instance.getItem(projectName).lastSuccessfulBuild.number
+            }
+            sh '''
+            aws ecr list-image --repository-name production-support-course
+'''
+        }
+      }
+    }
+  }
+  environment {
+    ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
+
+    imageAPIDevName='c374team02api-dev-'
+    imageAPIUATName='c374team02api-uat-'
+    imageDBDevName='c374team02db-dev-'
+    imageDBUATName='c374team02db-uat-'
+    imageFEDevName='c374team02fe-dev-'
+    imageFEUATName='c374team02fe-uat-'
+    projectName='c374team02'
+
+  }
+}
