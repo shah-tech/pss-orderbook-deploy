@@ -40,6 +40,8 @@ pipeline {
             APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_api_tags} --query 'images[].imageManifest' --output text)
             DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_db_tags} --query 'images[].imageManifest' --output text)
             FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_fe_tags} --query 'images[].imageManifest' --output text)
+            
+            #now, attach the new img number to the UAT, based on last successful uat build
             # Check API
             if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIUATName}${imgNum}" | wc -l) -eq 0 ]
             then
@@ -69,13 +71,23 @@ pipeline {
               fi
             fi
 
+            # Check Currency API
+            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageCurrencyUATName}${imgNum}" | wc -l) -eq 0 ]
+            then
+              # tag Dev to UAT
+              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageCurrencyUATName}${imgNum} --image-manifest "$CURRENCYMANIFEST"
+              then
+                exitvalue=4
+              fi
+            fi
+
             # Check SSH
             #if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageSSHUATName}${imgNum}" | wc -l) -eq 0 ]
             #then
               # tag Dev to uat
               #if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageSSHUATName}${imgNum} --image-manifest "$SSHMANIFEST"
               #then
-                #exitvalue=3
+                #exitvalue=4
               #fi
             #fi
 
@@ -88,6 +100,8 @@ pipeline {
                ;;
             3) echo "AC failed to push to repository"
                ;;
+            4) echo "CURRENCY API failed to push to repository"
+               ;;
             12) echo "API and DB failed to push to repository"
                ;;
             13) echo "API and AC failed to push to repository"
@@ -99,6 +113,7 @@ pipeline {
           esac
 
           exit ${exitvalue}
+'''
         }
       }
     }
@@ -106,7 +121,6 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
-    
     imageAPIUATName='c374team02api-uat-'
     imageDBUATName='c374team02db-uat-'
     imageFEUATName='c374team02fe-uat-'
