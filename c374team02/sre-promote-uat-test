@@ -27,22 +27,19 @@ pipeline {
             }
             sh '''
             export AWS_DEFAULT_REGION=us-east-1
-            #new img number, from the last successful uat image build
+            #new img number, based on the last successful uat build
             imgNum=$(( $(aws ecr list-images --repository-name production-support-course | grep c374team02api-uat | awk -F'"' '{print $4}' |   sort -V |   tail -n 1 | awk -F'-' '{print$3}'
 ) +1 ))
-            # Retrieve all dev image tags in one command
-            all_dev_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02" | grep "dev")
+            #new image tags, including their last ecr successful build number
 
-            # Extract specific tags for API, currency-api, fe, and db
-            dev_api_tags=$(echo "$all_dev_tags" | grep "c374team02api" | sort | tail -n 1)
-            dev_currapi_tags=$(echo "$all_dev_tags" | grep "c374team02currency-api" | sort | tail -n 1)
-            dev_fe_tags=$(echo "$all_dev_tags" | grep "c374team02fe" | sort | tail -n 1)
-            dev_db_tags=$(echo "$all_dev_tags" | grep "c374team02db" | sort | tail -n 1)
-
-            APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag="${dev_api_tags#*\"imageTag\": \"}" --query 'images[].imageManifest' --output text)
-            DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag="${dev_db_tags#*\"imageTag\": \"}" --query 'images[].imageManifest' --output text)
-            FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag="${dev_fe_tags#*\"imageTag\": \"}" --query 'images[].imageManifest' --output text)
-            #now, attach the new img number to the UAT, based on last successful uat build
+            dev_api_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02" | grep "dev" | sort | tail -n 1)
+            dev_currapi_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02currency-api" | grep "dev" | sort | tail -n 1)
+            dev_fe_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02fe" | grep "dev" | sort | tail -n 1)
+            dev_db_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02db" | grep "dev" | sort | tail -n 1)
+            
+            APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_api_tags} --query 'images[].imageManifest' --output text)
+            DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_db_tags} --query 'images[].imageManifest' --output text)
+            FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_fe_tags} --query 'images[].imageManifest' --output text)
             # Check API
             if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIUATName}${imgNum}" | wc -l) -eq 0 ]
             then
@@ -102,7 +99,6 @@ pipeline {
           esac
 
           exit ${exitvalue}
-'''
         }
       }
     }
@@ -110,6 +106,7 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
+    
     imageAPIUATName='c374team02api-uat-'
     imageDBUATName='c374team02db-uat-'
     imageFEUATName='c374team02fe-uat-'
