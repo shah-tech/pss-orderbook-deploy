@@ -40,8 +40,8 @@ pipeline {
             APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_api_tags} --query 'images[].imageManifest' --output text)
             DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_db_tags} --query 'images[].imageManifest' --output text)
             FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_fe_tags} --query 'images[].imageManifest' --output text)
-            
             #now, attach the new img number to the UAT, based on last successful uat build
+            
             # Check API
             if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIUATName}${imgNum}" | wc -l) -eq 0 ]
             then
