@@ -26,11 +26,79 @@ pipeline {
               buildNumber = Jenkins.instance.getItem(projectName).lastSuccessfulBuild.number
             }
             sh '''
+            export AWS_DEFAULT_REGION=us-east-1
+            #new img number, from the last successful uat image build
+            imgNum=$(( $(aws ecr list-images --repository-name production-support-course | grep c374team02api-uat | awk -F'"' '{print $4}' |   sort -V |   tail -n 1 | awk -F'-' '{print$3}'
+) +1 ))
             dev_api_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02" | grep "dev" | sort | tail -n 1))
             dev_currapi_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02currency-api" | grep "dev" | sort | tail -n 1))
             dev_fe_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02fe" | grep "dev" | sort | tail -n 1))
             dev_db_tags=$(aws ecr list-images --repository-name production-support-course | dev_tags=$(grep "c374team02db" | grep "dev" | sort | tail -n 1))
             echo "$dev_tags"$'\n'"$uat_tags"$'\n'"$prod_tags"
+            APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_api_tags} --query 'images[].imageManifest' --output text)
+            DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_db_tags} --query 'images[].imageManifest' --output text)
+            FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_fe_tags} --query 'images[].imageManifest' --output text)
+
+            #now, attach the new img number to the UAT, based on last successful uat build
+            # Check API
+            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIUATName}${imgNum}" | wc -l) -eq 0 ]
+            then
+              # tag Dev to UAT
+              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageAPIUATName}${imgNum} --image-manifest "$APIMANIFEST"
+              then
+                exitvalue=1
+              fi
+            fi
+            # Check DB
+            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageDBUATName}${imgNum}" | wc -l) -eq 0 ]
+            then
+              # tag Dev to UAT
+              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageDBUATName}${imgNum} --image-manifest "$DBMANIFEST"
+              then
+                exitvalue="${exitvalue}2"
+              fi
+            fi
+            
+            # Check Front End
+            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEUATName}${imgNum}" | wc -l) -eq 0 ]
+            then
+              # tag Dev to UAT
+              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEUATName}${imgNum} --image-manifest "$FEMANIFEST"
+              then
+                exitvalue=3
+              fi
+            fi
+
+            # Check SSH
+            #if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageSSHUATName}${imgNum}" | wc -l) -eq 0 ]
+            #then
+              # tag Dev to uat
+              #if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageSSHUATName}${imgNum} --image-manifest "$SSHMANIFEST"
+              #then
+                #exitvalue=3
+              #fi
+            #fi
+
+          case ${exitvalue} in
+            0) echo "Update OK"
+               ;;
+            1) echo "API failed to push to repository"
+               ;;
+            2) echo "DB failed to push to repository"
+               ;;
+            3) echo "AC failed to push to repository"
+               ;;
+            12) echo "API and DB failed to push to repository"
+               ;;
+            13) echo "API and AC failed to push to repository"
+               ;;
+            23) echo "DB and AC failed to push to repository"
+               ;;
+            123) echo "All images failed to push to repository"
+               ;;
+          esac
+
+          exit ${exitvalue}
 '''
         }
       }
@@ -39,11 +107,8 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
-    imageAPIDevName='c374team02api-dev-'
     imageAPIUATName='c374team02api-uat-'
-    imageDBDevName='c374team02db-dev-'
     imageDBUATName='c374team02db-uat-'
-    imageFEDevName='c374team02fe-dev-'
     imageFEUATName='c374team02fe-uat-'
     projectName='c374team02'
 
