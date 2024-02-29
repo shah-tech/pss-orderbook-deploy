@@ -34,10 +34,9 @@ pipeline {
             dev_currapi_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02currency-api" | grep "dev" | sort | tail -n 1)
             dev_fe_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02fe" | grep "dev" | sort | tail -n 1)
             dev_db_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02db" | grep "dev" | sort | tail -n 1)
-            APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_api_tags} --query 'images[].imageManifest' --output text)
-            DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_db_tags} --query 'images[].imageManifest' --output text)
-            FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_fe_tags} --query 'images[].imageManifest' --output text)
-
+            APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag="${dev_api_tags#*\"imageTag\": \"}" --query 'images[].imageManifest' --output text)
+            DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag="${dev_db_tags#*\"imageTag\": \"}" --query 'images[].imageManifest' --output text)
+            FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag="${dev_fe_tags#*\"imageTag\": \"}" --query 'images[].imageManifest' --output text)
             #now, attach the new img number to the UAT, based on last successful uat build
             # Check API
             if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIUATName}${imgNum}" | wc -l) -eq 0 ]
