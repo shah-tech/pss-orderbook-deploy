@@ -28,12 +28,12 @@ pipeline {
             sh '''
             export AWS_DEFAULT_REGION=us-east-1
             #new img number, based on the last successful uat build
-            imgNum=$(( $(aws ecr list-images --repository-name production-support-course | grep c374team02api-uat | awk -F'"' '{print $4}' |   sort |   tail -n 1 | awk -F'-' '{print$3}'
-) +1 ))
+            imgNum=$(( $(aws ecr list-images --repository-name production-support-course | grep 'c374team02api-uat' | awk -F'"' '{print $4}' | sort | tail -n 1 | awk -F'-' '{print $3}') + 1 ))
+
             #new image tags, including their last ecr successful build number
 
             dev_api_tags=$(aws ecr list-images --repository-name production-support-course | grep 'c374team02api-dev' | awk -F'"' '{print $4}' | sort | tail -n 1)
-            dev_currapi_tags=$(aws ecr list-images --repository-name production-support-course | grep 'c374team01currency-api-dev' | awk -F'"' '{print $4}' | sort -V | tail -n 1)
+            dev_currapi_tags=$(aws ecr list-images --repository-name production-support-course | grep 'c374team02currency-api-dev' | awk -F'"' '{print $4}' | sort -V | tail -n 1)
             dev_fe_tags=$(aws ecr list-images --repository-name production-support-course | grep 'c374team02fe-dev' | awk -F'"' '{print $4}' | sort | tail -n 1)
             dev_db_tags=$(aws ecr list-images --repository-name production-support-course | grep 'c374team02db-dev' | awk -F'"' '{print $4}' | sort | tail -n 1)
 
