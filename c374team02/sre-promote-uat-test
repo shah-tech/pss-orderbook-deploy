@@ -32,10 +32,11 @@ pipeline {
 ) +1 ))
             #new image tags, including their last ecr successful build number
 
-            dev_api_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02" | grep "dev" | sort | tail -n 1)
-            dev_currapi_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02currency-api" | grep "dev" | sort | tail -n 1)
-            dev_fe_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02fe" | grep "dev" | sort | tail -n 1)
-            dev_db_tags=$(aws ecr list-images --repository-name production-support-course | grep "c374team02db" | grep "dev" | sort | tail -n 1)
+            dev_api_tags=$(aws ecr list-images --repository-name production-support-course | grep c374team02api-dev |   awk -F'"' '{print $4}' |   sort -V |   tail -n 1)
+            dev_currapi_tags=$(aws ecr list-images --repository-name production-support-course | grep c374team01currency-api-dev |   awk -F'"' '{print $4}' |   sort -V |   tail -n 1)
+            dev_fe_tags=$(aws ecr list-images --repository-name production-support-course | grep c374team02fe-dev |   awk -F'"' '{print $4}' |   sort -V |   tail -n 1)
+            dev_db_tags=$(aws ecr list-images --repository-name production-support-course | grep c374team02db-dev |   awk -F'"' '{print $4}' |   sort -V |   tail -n 1)
+            
             
             APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_api_tags} --query 'images[].imageManifest' --output text)
             DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${dev_db_tags} --query 'images[].imageManifest' --output text)
